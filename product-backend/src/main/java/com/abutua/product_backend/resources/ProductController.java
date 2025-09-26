@@ -3,9 +3,12 @@ package com.abutua.product_backend.resources;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.abutua.product_backend.models.Product;
 
@@ -41,9 +44,23 @@ public class ProductController {
     }
 
     @GetMapping("products/{id}")
-    public Product getProduct(@PathVariable int id) {
-        return products.get(id - 1);
+    public ResponseEntity<Product> getProduct(@PathVariable int id){
+        
+        // if (id <= products.size()) {
+        //     return ResponseEntity.ok(products.get(id-1));   
+        // }
+        // else{
+        //     throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found");
+        // }
+
+        Product prod = products.stream()
+                                .filter( p -> p.getId() == id)
+                                .findFirst()
+                                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
+        
+        return ResponseEntity.ok(prod);
     }
+    
 
     @GetMapping("products")
     public List<Product> geProducts() {
